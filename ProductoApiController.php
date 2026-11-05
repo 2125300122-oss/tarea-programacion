@@ -53,33 +53,33 @@ class ProductoApiController extends Controller
      */
     public function store(Request $request)
     {
-        // $producto = new Producto();
-        // $producto->nombre = !empty($request->nombre) ? $request->nombre : 'Producto API ' . rand(100, 999);
-        // $producto->descripcion = !empty($request->descripcion) ? $request->descripcion : 'Descripción registrada desde la API';
-        // $producto->categoria_id = !empty($request->categoria_id) ? $request->categoria_id : 1;
-        // $producto->tipo_id = !empty($request->tipo_id) ? $request->tipo_id : 1;
-        // $producto->marca_id = !empty($request->marca_id) ? $request->marca_id : 1;
-        // $producto->precio = is_numeric($request->precio) ? $request->precio : 50.00;
-        // $producto->existencia = is_numeric($request->existencia) ? (int)$request->existencia : 20;
-        // $producto->descuento = is_numeric($request->descuento) ? $request->descuento : 0;
-        // $producto->imagen1 = "imagenes/productos/producto_default.png";
-        // $producto->imagen2 = "imagenes/productos/producto_default.png";
-        // $producto->imagen3 = "imagenes/productos/producto_default.png";
-        // $producto->estado = 1;
+        $producto = new Producto();
+        $producto->nombre = !empty($request->nombre) ? $request->nombre : 'Producto API ' . rand(100, 999);
+        $producto->descripcion = !empty($request->descripcion) ? $request->descripcion : 'Descripción registrada desde la API';
+        $producto->categoria_id = !empty($request->categoria_id) ? $request->categoria_id : 1;
+        $producto->tipo_id = !empty($request->tipo_id) ? $request->tipo_id : 1;
+        $producto->marca_id = !empty($request->marca_id) ? $request->marca_id : 1;
+        $producto->precio = is_numeric($request->precio) ? $request->precio : 50.00;
+        $producto->existencia = is_numeric($request->existencia) ? (int)$request->existencia : 20;
+        $producto->descuento = is_numeric($request->descuento) ? $request->descuento : 0;
+        $producto->imagen1 = "imagenes/productos/producto_default.png";
+        $producto->imagen2 = "imagenes/productos/producto_default.png";
+        $producto->imagen3 = "imagenes/productos/producto_default.png";
+        $producto->estado = 1;
 
-        // if ($request->hasFile('imagen1')) {
-        //     $publicUrl = ImageUploadService::uploadImage($request->file('imagen1'));
-        //     if ($publicUrl) {
-        //         $producto->imagen1 = $publicUrl;
-        //     }
-        // }
+        if ($request->hasFile('imagen1')) {
+            $publicUrl = ImageUploadService::uploadImage($request->file('imagen1'));
+            if ($publicUrl) {
+                $producto->imagen1 = $publicUrl;
+            }
+        }
 
-        // $producto->save();
+        $producto->save();
 
         return response()->json([
             'status' => true,
             'mensaje' => 'Producto registrado con éxito mediante la API REST',
-            // 'data' => $producto->load(['categoria', 'tipo', 'marca'])
+            'data' => $producto->load(['categoria', 'tipo', 'marca'])
         ], 201);
     }
 
@@ -89,37 +89,37 @@ class ProductoApiController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // $producto = Producto::find($id);
+        $producto = Producto::find($id);
 
-        // if (!$producto) {
-        //     return response()->json([
-        //         'status' => false,
-        //         'mensaje' => 'No se encontró el producto con ID ' . $id . ' para actualizar'
-        //     ], 404);
-        // }
+        if (!$producto) {
+            return response()->json([
+                'status' => false,
+                'mensaje' => 'No se encontró el producto con ID ' . $id . ' para actualizar'
+            ], 404);
+        }
 
-        // $producto->nombre = !empty($request->nombre) ? $request->nombre : $producto->nombre;
-        // $producto->descripcion = !empty($request->descripcion) ? $request->descripcion : $producto->descripcion;
-        // $producto->categoria_id = !empty($request->categoria_id) ? $request->categoria_id : $producto->categoria_id;
-        // $producto->tipo_id = !empty($request->tipo_id) ? $request->tipo_id : $producto->tipo_id;
-        // $producto->marca_id = !empty($request->marca_id) ? $request->marca_id : $producto->marca_id;
-        // $producto->precio = is_numeric($request->precio) ? $request->precio : $producto->precio;
-        // $producto->existencia = is_numeric($request->existencia) ? (int)$request->existencia : $producto->existencia;
-        // $producto->descuento = is_numeric($request->descuento) ? $request->descuento : $producto->descuento;
+        $producto->nombre = !empty($request->nombre) ? $request->nombre : $producto->nombre;
+        $producto->descripcion = !empty($request->descripcion) ? $request->descripcion : $producto->descripcion;
+        $producto->categoria_id = !empty($request->categoria_id) ? $request->categoria_id : $producto->categoria_id;
+        $producto->tipo_id = !empty($request->tipo_id) ? $request->tipo_id : $producto->tipo_id;
+        $producto->marca_id = !empty($request->marca_id) ? $request->marca_id : $producto->marca_id;
+        $producto->precio = is_numeric($request->precio) ? $request->precio : $producto->precio;
+        $producto->existencia = is_numeric($request->existencia) ? (int)$request->existencia : $producto->existencia;
+        $producto->descuento = is_numeric($request->descuento) ? $request->descuento : $producto->descuento;
 
-        // if ($request->hasFile('imagen1')) {
-        //     $publicUrl = ImageUploadService::uploadImage($request->file('imagen1'));
-        //     if ($publicUrl) {
-        //         $producto->imagen1 = $publicUrl;
-        //     }
-        // }
+        if ($request->hasFile('imagen1')) {
+            $publicUrl = ImageUploadService::uploadImage($request->file('imagen1'));
+            if ($publicUrl) {
+                $producto->imagen1 = $publicUrl;
+            }
+        }
 
-        // $producto->save();
+        $producto->save();
 
         return response()->json([
             'status' => true,
             'mensaje' => 'Producto actualizado correctamente vía API',
-            // 'data' => $producto->load(['categoria', 'tipo', 'marca'])
+            'data' => $producto->load(['categoria', 'tipo', 'marca'])
         ], 200);
     }
 
