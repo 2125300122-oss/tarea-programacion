@@ -4,117 +4,43 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Tipo;
-use App\Services\ImageUploadService;
+use Illuminate\Support\Facades\Http;
 
 class TipoApiController extends Controller
 {
+    private function getApiUrl($endpoint)
+    {
+        $baseUrl = env('API_BASE_URL', 'http://127.0.0.1:8000/api');
+        return rtrim($baseUrl, '/') . '/' . ltrim($endpoint, '/');
+    }
+
     public function index()
     {
-        $tipos = Tipo::where('estado', 1)->get();
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Lista de tipos obtenida correctamente',
-            'data' => $tipos
-        ], 200);
+        $response = Http::get($this->getApiUrl('/tipos'));
+        return response()->json($response->json(), $response->status());
     }
 
     public function show($id)
     {
-        $tipo = Tipo::find($id);
-
-        if (!$tipo) {
-            return response()->json([
-                'status' => false,
-                'mensaje' => 'Tipo de presentación no encontrado'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Tipo encontrado',
-            'data' => $tipo
-        ], 200);
+        $response = Http::get($this->getApiUrl('/tipos/' . $id));
+        return response()->json($response->json(), $response->status());
     }
 
     public function store(Request $request)
     {
-        $nombreIngresado = !empty($request->nombre) ? $request->nombre : 'Tipo API ' . rand(100, 999);
-
-        // Si el nombre ya existe en la base de datos, le añade un sufijo para evitar error de duplicado
-        if (Tipo::where('nombre', $nombreIngresado)->exists()) {
-            $nombreIngresado = $nombreIngresado . ' (' . rand(10, 99) . ')';
-        }
-
-        $tipo = new Tipo();
-        $tipo->nombre = $nombreIngresado;
-        $tipo->imagen = "imagenes/tipos/tipo_default.png";
-        $tipo->estado = 1;
-
-        if ($request->hasFile('imagen')) {
-            $publicUrl = ImageUploadService::uploadImage($request->file('imagen'));
-            if ($publicUrl) {
-                $tipo->imagen = $publicUrl;
-            }
-        }
-
-        $tipo->save();
-
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Tipo registrado con éxito vía API REST',
-            'data' => $tipo
-        ], 201);
+        $response = Http::post($this->getApiUrl('/tipos'), $request->all());
+        return response()->json($response->json(), $response->status());
     }
 
     public function update(Request $request, $id)
     {
-        $tipo = Tipo::find($id);
-
-        if (!$tipo) {
-            return response()->json([
-                'status' => false,
-                'mensaje' => 'Tipo de presentación no encontrado'
-            ], 404);
-        }
-
-        if (!empty($request->nombre)) {
-            $tipo->nombre = $request->nombre;
-        }
-
-        if ($request->hasFile('imagen')) {
-            $publicUrl = ImageUploadService::uploadImage($request->file('imagen'));
-            if ($publicUrl) {
-                $tipo->imagen = $publicUrl;
-            }
-        }
-
-        $tipo->save();
-
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Tipo actualizado con éxito vía API',
-            'data' => $tipo
-        ], 200);
+        $response = Http::put($this->getApiUrl('/tipos/' . $id), $request->all());
+        return response()->json($response->json(), $response->status());
     }
 
     public function destroy($id)
     {
-        $tipo = Tipo::find($id);
-
-        if (!$tipo) {
-            return response()->json([
-                'status' => false,
-                'mensaje' => 'Tipo no encontrado'
-            ], 404);
-        }
-
-        $tipo->estado = 0;
-        $tipo->save();
-
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Tipo eliminado con éxito'
-        ], 200);
+        $response = Http::delete($this->getApiUrl('/tipos/' . $id));
+        return response()->json($response->json(), $response->status());
     }
 }

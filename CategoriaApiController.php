@@ -4,116 +4,43 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Categoria;
-use App\Services\ImageUploadService;
+use Illuminate\Support\Facades\Http;
 
 class CategoriaApiController extends Controller
 {
+    private function getApiUrl($endpoint)
+    {
+        $baseUrl = env('API_BASE_URL', 'http://127.0.0.1:8000/api');
+        return rtrim($baseUrl, '/') . '/' . ltrim($endpoint, '/');
+    }
+
     public function index()
     {
-        $categorias = Categoria::where('estado', 1)->get();
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Lista de categorías obtenida correctamente',
-            'data' => $categorias
-        ], 200);
+        $response = Http::get($this->getApiUrl('/categorias'));
+        return response()->json($response->json(), $response->status());
     }
 
     public function show($id)
     {
-        $categoria = Categoria::find($id);
-
-        if (!$categoria) {
-            return response()->json([
-                'status' => false,
-                'mensaje' => 'Categoría no encontrada'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Categoría encontrada',
-            'data' => $categoria
-        ], 200);
+        $response = Http::get($this->getApiUrl('/categorias/' . $id));
+        return response()->json($response->json(), $response->status());
     }
 
     public function store(Request $request)
     {
-        $nombreIngresado = !empty($request->nombre) ? $request->nombre : 'Categoría API ' . rand(100, 999);
-
-        if (Categoria::where('nombre', $nombreIngresado)->exists()) {
-            $nombreIngresado = $nombreIngresado . ' (' . rand(10, 99) . ')';
-        }
-
-        $categoria = new Categoria();
-        $categoria->nombre = $nombreIngresado;
-        $categoria->imagen = "imagenes/categorias/categoria_default.png";
-        $categoria->estado = 1;
-
-        if ($request->hasFile('imagen')) {
-            $publicUrl = ImageUploadService::uploadImage($request->file('imagen'));
-            if ($publicUrl) {
-                $categoria->imagen = $publicUrl;
-            }
-        }
-
-        $categoria->save();
-
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Categoría registrada con éxito vía API REST',
-            'data' => $categoria
-        ], 201);
+        $response = Http::post($this->getApiUrl('/categorias'), $request->all());
+        return response()->json($response->json(), $response->status());
     }
 
     public function update(Request $request, $id)
     {
-        $categoria = Categoria::find($id);
-
-        if (!$categoria) {
-            return response()->json([
-                'status' => false,
-                'mensaje' => 'Categoría no encontrada'
-            ], 404);
-        }
-
-        if (!empty($request->nombre)) {
-            $categoria->nombre = $request->nombre;
-        }
-
-        if ($request->hasFile('imagen')) {
-            $publicUrl = ImageUploadService::uploadImage($request->file('imagen'));
-            if ($publicUrl) {
-                $categoria->imagen = $publicUrl;
-            }
-        }
-
-        $categoria->save();
-
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Categoría actualizada con éxito vía API',
-            'data' => $categoria
-        ], 200);
+        $response = Http::put($this->getApiUrl('/categorias/' . $id), $request->all());
+        return response()->json($response->json(), $response->status());
     }
 
     public function destroy($id)
     {
-        $categoria = Categoria::find($id);
-
-        if (!$categoria) {
-            return response()->json([
-                'status' => false,
-                'mensaje' => 'Categoría no encontrada'
-            ], 404);
-        }
-
-        $categoria->estado = 0;
-        $categoria->save();
-
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Categoría eliminada con éxito'
-        ], 200);
+        $response = Http::delete($this->getApiUrl('/categorias/' . $id));
+        return response()->json($response->json(), $response->status());
     }
 }

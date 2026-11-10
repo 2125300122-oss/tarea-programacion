@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Producto;
+use App\Models\Categoria;
+use App\Models\Tipo;
+use App\Models\Marca;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Producto;
 use App\Services\ImageUploadService;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,19 +19,18 @@ class ProductoApiController extends Controller
      */
     public function index()
     {
-        $productos = Producto::where('estado', 1)->with(['categoria', 'tipo', 'marca'])->get();
+        $productos = Producto::with(['categoria', 'tipo', 'marca'])->get();
 
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Lista de productos obtenida correctamente',
-            'data' => $productos
-        ], 200);
+        return response()->json($productos);
     }
+        //     'status' => true,
+        //     'mensaje' => 'Lista de productos obtenida correctamente',
+        //     'data' => $productos
+        // ], 200);
+    
+    
+    
 
-    /**
-     * GET /api/productos/{id}
-     * Retorna un producto específico por ID.
-     */
     public function show($id)
     {
          $producto = Producto::with(['categoria', 'tipo', 'marca'])->find($id);
